@@ -16,6 +16,8 @@ import {
 import {alarmMock, ciList} from '@/services/ant-design-pro/api';
 import localStorage from "localStorage";
 import difference from 'lodash/difference';
+import type { FormInstance } from 'antd/es/form';
+
 
 
 type TransferItem = GetProp<TransferProps, 'dataSource'>[number];
@@ -86,7 +88,7 @@ export default () => {
   const [roomList, setRoomList] = useState([]);
   const [targetKeys, setTargetKeys] = useState<string[]>([]);
   const [api, contextHolder] = notification.useNotification();
-  const [form] = Form.useForm();
+  const formRef = React.useRef<FormInstance>(null);
 
 
   const handleSelectChange = (value) => {
@@ -153,7 +155,8 @@ export default () => {
       console.log("topic-"+topicStr)
       if (null !== topicStr) {
         setTopic(topicStr)
-        form.setFieldsValue({ kafkaTopic: topicStr });
+        console.log("topic2-"+topicStr)
+        formRef.current?.setFieldsValue({ kafkaTopic: topicStr });
 
       }
 
@@ -222,6 +225,7 @@ export default () => {
 
   return <>
     <Form
+      ref={formRef}
       onFinish={handleTransferSubmit}
       name="trigger" style={{maxWidth: 600}} layout="vertical" autoComplete="off">
       <Space size={372}>
@@ -239,11 +243,14 @@ export default () => {
           />
         </Form.Item>
         <Form.Item
-          /*hasFeedback*/
+          hasFeedback
           label="kafka topic"
           name="kafkaTopic"
+          id="kafkaTopic"
+          value={topic}
           rules={[{required: true, message: '请填写kafka toipc!'}]}>
           <Input
+            id="kafkaTopic"
             style={{width: 200}}
             onChange={handleTopicChange}/>
         </Form.Item>
