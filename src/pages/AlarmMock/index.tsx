@@ -16,8 +16,7 @@ import {
 import {alarmMock, ciList} from '@/services/ant-design-pro/api';
 import localStorage from "localStorage";
 import difference from 'lodash/difference';
-import type { FormInstance } from 'antd/es/form';
-
+import type {FormInstance} from 'antd/es/form';
 
 
 type TransferItem = GetProp<TransferProps, 'dataSource'>[number];
@@ -54,6 +53,7 @@ const TableTransfer = ({leftColumns, rightColumns, ...restProps}: TableTransferP
           onItemSelectAll(diffKeys as string[], selected);
         },
         onSelect({key}, selected) {
+          console.log(key + selected)
           onItemSelect(key as string, selected);
         },
         selectedRowKeys: listSelectedKeys,
@@ -71,7 +71,11 @@ const TableTransfer = ({leftColumns, rightColumns, ...restProps}: TableTransferP
           onRow={({key, disabled: itemDisabled}) => ({
             onClick: () => {
               if (itemDisabled || listDisabled) return;
-              onItemSelect(key as string, !listSelectedKeys.includes(key as string));
+              try {
+                onItemSelect(key as string, !listSelectedKeys.includes(key as string));
+              } catch (e) {
+                throw new Error("select table item failed");
+              }
             },
           })}
         />
@@ -151,16 +155,16 @@ export default () => {
         return temp;
       }));
 
-      let topicStr = localStorage.getItem("alarm.topic."+dataCenterId);
-      console.log("topic-"+topicStr)
+      let topicStr = localStorage.getItem("alarm.topic." + dataCenterId);
+      console.log("topic-" + topicStr)
       if (null !== topicStr) {
         setTopic(topicStr)
-        console.log("topic2-"+topicStr)
-        formRef.current?.setFieldsValue({ kafkaTopic: topicStr });
+        console.log("topic2-" + topicStr)
+        formRef.current?.setFieldsValue({kafkaTopic: topicStr});
 
       }
 
-      let itemStr = localStorage.getItem("alarm.targetKeys."+dataCenterId);
+      let itemStr = localStorage.getItem("alarm.targetKeys." + dataCenterId);
       if (null !== itemStr) {
         setTargetKeys(JSON.parse(itemStr))
       }
@@ -194,8 +198,11 @@ export default () => {
 
   const tableColumns = [
     {
+      width: 100,
       dataIndex: 'title',
       title: 'ciName',
+      ellipsis: true,
+      fixed: 'left',
       render: (ciName) => (
         <Tooltip placement="topLeft" title={ciName}>
           {ciName}
@@ -203,19 +210,39 @@ export default () => {
       ),
     },
     {
+      width: 80,
       dataIndex: 'belongToDataCenter',
       title: '所属数据中心',
-      render: (tag) => <Tag>{tag}</Tag>,
+      fixed: 'left',
+      ellipsis: true,
+      render: (tag) =>
+        <Tag>
+          <Tooltip placement="topLeft" title={tag}>
+            {tag}
+          </Tooltip>
+        </Tag>,
     },
     {
+      /*width: 120,*/
       dataIndex: 'belongToBuilding',
       title: '所属楼宇',
-      render: (tag) => <Tag>{tag}</Tag>,
+      render: (tag) =>
+        <Tag>
+          <Tooltip placement="topLeft" title={tag}>
+            {tag}
+          </Tooltip>
+        </Tag>,
     },
     {
+      /*width: 120,*/
       dataIndex: 'belongToStorey',
       title: '所属楼层',
-      render: (tag) => <Tag>{tag}</Tag>,
+      render: (tag) =>
+        <Tag>
+          <Tooltip placement="topLeft" title={tag}>
+            {tag}
+          </Tooltip>
+        </Tag>,
     }
   ];
 
